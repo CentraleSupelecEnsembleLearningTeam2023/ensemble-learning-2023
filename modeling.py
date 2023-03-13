@@ -19,6 +19,9 @@ def reg_metrics(y_train,pred_train,y_test,pred_test):
   print("Out-of-sample R²:", r2_test)
 
 def train_linear_reg(X_train,y_train,X_test,y_test):
+  '''
+  Function to conduct linear regression model.
+  '''
   from sklearn.model_selection import cross_val_score, KFold
   from sklearn.linear_model import LinearRegression
 
@@ -26,3 +29,14 @@ def train_linear_reg(X_train,y_train,X_test,y_test):
 
   lr.fit(X_train,y_train)
   reg_metrics(y_train,lr.predict(X_train),y_test,lr.predict(X_test))
+
+def train_decision_tree(X_train,y_train,X_test,y_test,max_depth= None,min_samples_split = 2):
+  '''
+  Function to conduct decision tree model.
+  '''
+  from sklearn.tree import DecisionTreeRegressor
+
+  clf = DecisionTreeRegressor(max_depth = max_depth,min_samples_split = min_samples_split)
+
+  clf.fit(X_train,y_train)
+  reg_metrics(y_train,clf.predict(X_train),y_test,clf.predict(X_test))
