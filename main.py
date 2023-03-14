@@ -27,17 +27,19 @@ num_features = ['price','minimum_nights','number_of_reviews','reviews_per_month'
                 'calculated_host_listings_count','availability_365','last_review_recency']
 
 
-def preprocess_data(df, num_features):
-    df = fill_missing_values(df)
-    df = log_data(df,num_features)
-    df  = scale_data(df,num_features)
-    df = one_hot_data(df,['neighbourhood_group','room_type'])
-    df = encode_data(df,['neighbourhood'])
-    # ADD feature engineered columns
-    df['last_review_recency'] = recency(df)
-    # @ who did one-hot,
-    # we need to update the keepcolumns list to add the new categorical columns ?
-    X_train,y_train,X_test,y_test = split_data(df,keepcolumns)
+def preprocess_data(df, num_features,keepcolumns):
+    df = fill_missing_values(df) #Add missing values
+
+    df  = scale_data(df,num_features) #scale numerical features
+    df = one_hot_data(df,['neighbourhood_group','room_type']) #one hot encode small category data
+    df,encoded_columns = encode_data(df,['neighbourhood']) #encode large category data
+
+    for column in ['neighbourhood_group','room_type']:#modify keep columns to add one hot encode changes
+        keepcolumns.remove(column)
+    keepcolumns = keepcolumns + encoded_columns
+
+    X_train,y_train,X_test,y_test = split_data(df,keepcolumns) #split data into train and test set
+
     return X_train,y_train,X_test,y_test
 
 def train_models():
@@ -52,7 +54,7 @@ if __name__ == "__main__":
     # read the csv file as a dataframe
     path = 'new-york-city-airbnb-open-data/AB_NYC_2019.csv'
     df = pd.read_csv(path, sep=',')
-    X_train,y_train,X_test,y_test = preprocess_data(df, num_features)
+    X_train,y_train,X_test,y_test = preprocess_data(df, num_features,keepcolumns)
     train_models()
     '''
     preprocessing functions ()
