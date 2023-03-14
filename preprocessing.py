@@ -81,14 +81,21 @@ def split_data(df,columns_to_keep,test_size = 0.2):
 
 # Define the function to conduct the one-hot encoding for the categorical features
 def one_hot_data(df, cat_features):
-    '''one hot encodes categorical selected categorical features
-    Returns: (eg: 0,1)
-    ------------------
-    df_encoded - dataframe with one_hot encoded columns
-    '''
-    df_encoded = pd.get_dummies(df, columns=cat_features)
-   
-    return df_encoded
+  '''one hot encodes categorical selected categorical features
+  Returns:
+  ------------------
+  df_encoded - dataframe with one_hot encoded columns
+  encoded_columns - list of columns names of one hot encoded columns
+  '''
+  unique_categories = 0
+  for column in cat_features:
+    unique_categories += df[column].nunique()
+
+  df_encoded = pd.get_dummies(df, columns=cat_features)
+  
+  encoded_columns = list(df_encoded.columns[len(df.columns)+ unique_categories - 1::-1][:unique_categories])
+
+  return df_encoded, encoded_columns
 
 # Define the function to conduct the label encoding for the categorical features
 def encode_data(df,cat_features): 
