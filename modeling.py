@@ -40,3 +40,12 @@ def train_decision_tree(X_train,y_train,X_test,y_test,max_depth= None,min_sample
 
   clf.fit(X_train,y_train)
   reg_metrics(y_train,clf.predict(X_train),y_test,clf.predict(X_test))
+
+
+def train_random_forest(X_train,y_train,X_test,y_test,estimators = 100,max_depth= None,min_samples_split = 2):
+  from sklearn.ensemble import RandomForestRegressor
+
+  rf = RandomForestRegressor(n_estimators = estimators,max_depth = max_depth,min_samples_split = min_samples_split)
+
+  rf.fit(X_train,y_train)
+  reg_metrics(y_train,rf.predict(X_train),y_test,rf.predict(X_test))

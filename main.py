@@ -37,6 +37,7 @@ def preprocess_data(df, num_features):
 def train_models():
     train_linear_reg(X_train, y_train, X_test, y_test)
     train_decision_tree(X_train,y_train,X_test,y_test, max_depth=None, min_samples_split=2)
+    train_random_forest(X_train,y_train,X_test,y_test,estimators = 100,max_depth= None,min_samples_split = 2)
 
 """
 This is the main module to run the script and functions defined 
