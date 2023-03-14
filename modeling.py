@@ -5,7 +5,7 @@ def reg_metrics(y_train,pred_train,y_test,pred_test,transform = False):
   '''
   Function to calculate rmse and R^2 on training and out of sample data.
   Possibility to also transform data back to regular form since features
-  and targets log transformed for training
+  and targets log transformed for training.
   '''
   from sklearn.metrics import mean_squared_error, r2_score
 
