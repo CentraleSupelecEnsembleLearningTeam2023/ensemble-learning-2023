@@ -19,6 +19,7 @@ def fill_missing_values(df):
 
   return df
 
+
 # Define the function to apply boxcox transformation
 def transform_boxCox(df,num_features):
   '''Apply BoxCox transfromation to columns to improve data distribution
@@ -33,6 +34,16 @@ def transform_boxCox(df,num_features):
     df_transformed[col],_ = boxcox(df_transformed[col]+epsilon)
   return df_transformed
 
+#Define the function to log transform data
+def log_data(df,num_features):
+  '''returns natural log of numerical data
+  '''
+  df_transformed = df.copy()
+
+  for col in num_features:
+    df_transformed[col] = np.log(df_transformed[col]+1)
+
+  return df_transformed
 
 # Define the function to scale the input data
 def scale_data(df,num_features):
