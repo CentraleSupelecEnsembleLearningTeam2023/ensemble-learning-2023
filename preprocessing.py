@@ -19,6 +19,21 @@ def fill_missing_values(df):
 
   return df
 
+# Define the function to apply boxcox transformation
+def transform_boxCox(df,num_features):
+  '''Apply BoxCox transfromation to columns to improve data distribution
+  of numerical variables
+  '''
+  ## Box cox transformation (not removing outliers)
+  # apply Box-Cox transformation to the selected columns
+  from scipy.stats import boxcox
+  epsilon = 0.001  # to keep strictly positive bound for box cox transformation
+  df_transformed = df.copy()
+  for col in num_features:
+    df_transformed[col],_ = boxcox(df_transformed[col]+epsilon)
+  return df_transformed
+
+
 # Define the function to scale the input data
 def scale_data(df,num_features):
     '''Scales the data to a specific using Min Max Scalar method so that

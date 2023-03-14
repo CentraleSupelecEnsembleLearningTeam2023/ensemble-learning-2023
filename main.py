@@ -28,6 +28,7 @@ num_features = ['price','minimum_nights','number_of_reviews','reviews_per_month'
 
 def preprocess_data(df, num_features):
     df = fill_missing_values(df)
+    df = transform_boxCox(df,num_features)
     df  = scale_data(df,num_features)
     df = one_hot_data(df,['neighbourhood_group','room_type'])
     df = encode_data(df,['neighbourhood'])
