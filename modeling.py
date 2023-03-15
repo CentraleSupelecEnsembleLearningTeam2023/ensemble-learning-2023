@@ -1,5 +1,7 @@
 # Functions to be used for modeling and training
 import numpy as np
+import pandas as pd
+import seaborn as sns
 
 def reg_metrics(y_train,pred_train,y_test,pred_test,transform = False):
   '''
@@ -86,3 +88,55 @@ def train_random_forest(X_train,y_train,X_test,y_test,estimators = 100,max_depth
   else:
     rf.fit(X_train,y_train)
     reg_metrics(y_train,rf.predict(X_train),y_test,rf.predict(X_test),transform = transform)
+
+def train_ensemble_models(X_train, y_train):
+  '''Training an ensemble of several models to find best performing cv performance from:
+  Linear Regression
+  Random Forest Regressor
+  Decision Tree Regressor
+  Support Vector Machine Regressor
+  K Neighbors Reggresor
+  Gradient Boosting Regressor
+  Extra Trees Regressor
+  '''
+  from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor, ExtraTreesRegressor
+  from sklearn.linear_model import LinearRegression
+  from sklearn.neighbors import KNeighborsRegressor
+  from sklearn.tree import DecisionTreeRegressor
+  from sklearn.svm import SVR
+  from sklearn.model_selection import GridSearchCV, cross_val_score, KFold
+
+  kfold = KFold(n_splits=10)
+
+  regressors = []
+  regressors.append(SVR()) 
+  regressors.append(DecisionTreeRegressor()) 
+  regressors.append(RandomForestRegressor())
+  regressors.append(ExtraTreesRegressor())
+  regressors.append(GradientBoostingRegressor())
+  regressors.append(KNeighborsRegressor())
+  regressors.append(LinearRegression())
+
+  cv_results = []
+  for regressor in regressors:
+      cv_results.append(cross_val_score(regressor, X_train, y_train,
+                                        scoring='r2', cv=kfold, n_jobs=-1))
+      print("{} Regressor CV complete!".format(regressor))
+  cv_means = []
+  cv_std = []
+  for cv_result in cv_results:
+      cv_means.append(cv_result.mean())
+      cv_std.append(cv_result.std())
+
+  cvResDf = pd.DataFrame({'cv_mean': cv_means,
+                          'cv_std': cv_std,
+                          'algorithm': ['SVR', 'DecisionTreeReg', 'RandomForestReg', 'ExtraTreesReg',
+                                        'GradientBoostingReg', 'KNN', 'LinearReg']})
+  
+  cvResFacet=sns.FacetGrid(cvResDf.sort_values(by='cv_mean',ascending=False),sharex=False,
+            sharey=False,aspect=2)
+  cvResFacet.map(sns.barplot,'cv_mean','algorithm',**{'xerr':cv_std},
+               palette='muted')
+  cvResFacet.add_legend()
+
+  return cvResDf
