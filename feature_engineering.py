@@ -69,22 +69,3 @@ def numstation(la, lo, df2):
     count = np.sum(distances <= 1000)
     
     return count
-
-def add_engineered_features(df):
-    '''
-  Function to add features engineered in aggregrate manner
-  '''
-    # Read in the new york subway stations location data data
-    # Source: https://data.ny.gov/en/Transportation/NYC-Transit-Subway-Station-Map/6xm2-7ffy
-    stations = pd.read_csv('new-york-city-airbnb-open-data/NYC_Transit_Subway_Station_Location.csv')
-    #from tqdm import tqdm, tqdm_pandas
-    #tqdm.pandas()
-
-    df_transformed = df.copy()
-    df_transformed['last_review_recency'] = recency(df_transformed)
-    df_transformed['count_words_in_listing'] = count_words_in_listing(df_transformed)
-    df_transformed['num_of_stations_nearby'] = df_transformed.apply(lambda row: numstation(row['latitude'], row['longitude'], stations), axis = 1)
-    # Use the following line if you want to track the progress
-    #df_transformed['num_of_stations_nearby'] = df_transformed.progress_apply(lambda row: numstation(row['latitude'], row['longitude'], stations), axis = 1)
-
-    return df_transformed

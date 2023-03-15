@@ -19,14 +19,76 @@ stopwords_ENG = stopwords.words('english')
 
 import pandas as pd
 
-keepcolumns = ['price','minimum_nights', 'number_of_reviews', 'neighbourhood_group',
-       'room_type','calculated_host_listings_count', 'reviews_per_month', 'neighbourhood',
-       'availability_365','last_review_recency','count_words_in_listing','num_of_stations_nearby']
 
-num_features = ['price','minimum_nights','number_of_reviews','reviews_per_month',
-                'calculated_host_listings_count','availability_365','last_review_recency',
-                'count_words_in_listing','num_of_stations_nearby']
+def add_engineered_features(df):
+    '''
+  Function to add features engineered in aggregrate manner
+  '''
+    # Read in the new york subway stations location data data
+    # Source: https://data.ny.gov/en/Transportation/NYC-Transit-Subway-Station-Map/6xm2-7ffy
+    stations = pd.read_csv('new-york-city-airbnb-open-data/NYC_Transit_Subway_Station_Location.csv')
+    #from tqdm import tqdm, tqdm_pandas
+    #tqdm.pandas()
 
+    df_transformed = df.copy()
+    df_transformed['last_review_recency'] = recency(df_transformed)
+    df_transformed['count_words_in_listing'] = count_words_in_listing(df_transformed)
+    df_transformed['num_of_stations_nearby'] = df_transformed.apply(lambda row: numstation(row['latitude'], row['longitude'], stations), axis = 1)
+    # Use the following line if you want to track the progress
+    #df_transformed['num_of_stations_nearby'] = df_transformed.progress_apply(lambda row: numstation(row['latitude'], row['longitude'], stations), axis = 1)
+
+    return df_transformed
+
+def preprocess_data(df,columns_to_keep,cat_features,num_features,plot_dist = False,transform = True,encode = False,
+                    one_hot_features = None, test_size  = 0.2):
+  '''Function to preprocess data for modelling
+  Parameters:
+  -----------------------
+  df - dataframe to preprocess
+  columns_to_keep - columns to be used for modelling
+  cat_features - categorical features (must be in columns_to_keep)
+  num_features  - nuemerical features (must be in columns_to_keep)
+  plot_dist - Boolean if want to view distribution of numerical data after transformation
+  tranform - Boolean if numerical data to be log transformed
+  encode - Boolean if categorical data to be encoded
+  one_hot_features - if enode is True, features to be 1hot encoded. rest of categorical features 
+                    will be encoded into numerical data
+  test_size - size of test set
+
+  Returns:
+  -------------------------
+  X_train - training features
+  X_test - test features
+  y_train - training target
+  y_test - test target
+
+
+  '''
+  df_transformed = df.copy()
+  kept_columns = columns_to_keep.copy()
+  if transform == True:
+    df_transformed = log_data(df_transformed,num_features) #log tranforms numerical features
+  
+  df_transformed = scale_data(df_transformed,num_features) #scales numerical data
+  
+  if plot_dist ==True:
+    plot_density_per_num_column(df_transformed,num_features) #plot dist numerical columns
+
+  if encode == True:
+    df_transformed, encoded_columns = one_hot_data(df_transformed,one_hot_features) #1hot encode selected cat features
+
+    for column in one_hot_features:
+      kept_columns.remove(column)
+
+    kept_columns = kept_columns + encoded_columns
+
+    #numerically encodes rest of categorical features
+    df_transformed = encode_data(df_transformed,[column for column in cat_features if column not in one_hot_features])
+  
+  #split data into train and test set
+  X_train,X_test,y_train,y_test = split_data(df_transformed, columns_to_keep = kept_columns,test_size = test_size)
+  
+  return X_train,y_train, X_test, y_test
 
 def train_models(X_train, y_train, X_test, y_test):
     #train_linear_reg(X_train, y_train, X_test, y_test, cross_val = False)
@@ -42,7 +104,28 @@ if __name__ == "__main__":
     # read the csv file as a dataframe
     path = 'new-york-city-airbnb-open-data/AB_NYC_2019.csv'
     df = pd.read_csv(path, sep=',')
-    X_train,y_train,X_test,y_test = preprocess_data(df, num_features,keepcolumns)
+
+    #add engineered features
+    df = add_engineered_features(df)
+
+    #columns to keep and define numerical and categorical
+    keepcolumns = ['price','minimum_nights', 'number_of_reviews', 'neighbourhood_group',
+       'room_type','calculated_host_listings_count', 'reviews_per_month', 'neighbourhood',
+       'availability_365','last_review_recency','count_words_in_listing','num_of_stations_nearby']
+
+    num_features = ['price','minimum_nights','number_of_reviews','reviews_per_month',
+                'calculated_host_listings_count','availability_365','last_review_recency',
+                'count_words_in_listing','num_of_stations_nearby']
+    
+    cat_features = ['neighbourhood_group','neighbourhood','room_type']
+    
+    #pre process data
+    X_train,y_train, X_test, y_test= preprocess_data(df,columns_to_keep = keepcolumns,cat_features = cat_features,
+                                                   num_features = num_features,plot_dist = False, encode = True,
+                                                   one_hot_features = ['neighbourhood_group','room_type'],
+                                                   test_size = 0.2)
+    
+    #train models
     train_models(X_train, y_train, X_test, y_test)
     '''
     preprocessing functions ()
