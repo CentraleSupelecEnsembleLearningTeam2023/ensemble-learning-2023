@@ -64,7 +64,7 @@ def preprocess_data(df,columns_to_keep,cat_features,num_features,plot_dist = Fal
     plot_density_per_num_column(df_transformed,num_features) #plot dist numerical columns
 
   if encode == True:
-    df_transformed, encoded_columns = one_hot_data(df_transformed,one_hot_features) #1hot encode selected cat features
+    df_transformed, encoded_columns = one_hot_data(df_transformed,one_hot_features) #1hot-encode selected cat features
 
     for column in one_hot_features:
       kept_columns.remove(column)
