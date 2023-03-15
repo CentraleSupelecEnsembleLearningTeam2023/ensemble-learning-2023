@@ -22,8 +22,8 @@ import pandas as pd
 
 def add_engineered_features(df):
     '''
-  Function to add features engineered in aggregrate manner
-  '''
+    Function to add features engineered in aggregrate manner
+    '''
     # Read in the new york subway stations location data data
     # Source: https://data.ny.gov/en/Transportation/NYC-Transit-Subway-Station-Map/6xm2-7ffy
     stations = pd.read_csv('new-york-city-airbnb-open-data/NYC_Transit_Subway_Station_Location.csv')
@@ -41,7 +41,8 @@ def add_engineered_features(df):
 
 def preprocess_data(df,columns_to_keep,cat_features,num_features,plot_dist = False,transform = True,encode = False,
                     one_hot_features = None, test_size  = 0.2):
-  '''Function to preprocess data for modelling
+  '''
+  Function to preprocess data for modelling
   Parameters:
   -----------------------
   df - dataframe to preprocess
@@ -51,7 +52,7 @@ def preprocess_data(df,columns_to_keep,cat_features,num_features,plot_dist = Fal
   plot_dist - Boolean if want to view distribution of numerical data after transformation
   tranform - Boolean if numerical data to be log transformed
   encode - Boolean if categorical data to be encoded
-  one_hot_features - if enode is True, features to be 1hot encoded. rest of categorical features 
+  one_hot_features - Boolean if enode is True, features to be 1hot encoded. rest of categorical features
                     will be encoded into numerical data
   test_size - size of test set
 
@@ -61,11 +62,10 @@ def preprocess_data(df,columns_to_keep,cat_features,num_features,plot_dist = Fal
   X_test - test features
   y_train - training target
   y_test - test target
-
-
   '''
   df_transformed = df.copy()
   kept_columns = columns_to_keep.copy()
+  df_transformed = fill_missing_values(df_transformed) # missing value imputation
   if transform == True:
     df_transformed = log_data(df_transformed,num_features) #log tranforms numerical features
   
@@ -90,6 +90,10 @@ def preprocess_data(df,columns_to_keep,cat_features,num_features,plot_dist = Fal
   
   return X_train,y_train, X_test, y_test
 
+"""
+considering multiple models, and some have different preoricessing, e.g. catboost,
+we should abandon this function and move the functions to the main module
+"""
 def train_models(X_train, y_train, X_test, y_test):
     #train_linear_reg(X_train, y_train, X_test, y_test, cross_val = False)
     #train_decision_tree(X_train,y_train,X_test,y_test,max_depth= None,min_samples_split = 2,cross_val = False,grid_search = False,transform = False)
@@ -120,13 +124,25 @@ if __name__ == "__main__":
     cat_features = ['neighbourhood_group','neighbourhood','room_type']
     
     #pre process data
-    X_train,y_train, X_test, y_test= preprocess_data(df,columns_to_keep = keepcolumns,cat_features = cat_features,
-                                                   num_features = num_features,plot_dist = False, encode = True,
-                                                   one_hot_features = ['neighbourhood_group','room_type'],
-                                                   test_size = 0.2)
-    
+    X_train_encoded,y_train_encoded, X_test_encoded, y_test_encoded = preprocess_data(df, columns_to_keep=keepcolumns, cat_features=cat_features,
+                                                   num_features=num_features, plot_dist=False, encode=True,
+                                                   one_hot_features=['neighbourhood_group','room_type'],
+                                                   test_size=0.2)
+    X_train, y_train, X_test, y_test = preprocess_data(df, columns_to_keep=keepcolumns, cat_features=cat_features,
+                                                   num_features=num_features, plot_dist=False, encode=True,
+                                                   one_hot_features=['neighbourhood_group','room_type'],
+                                                   test_size=0.2)
+
     #train models
-    train_models(X_train, y_train, X_test, y_test)
+    train_ensemble_models(X_train_encoded, y_train_encoded)
+
+    train_lgbm(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded, estimators=200, lr=0.07, n_jobs=-1, rs=42,
+               transform=False)
+    train_xgb(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded, estimators=200, lr=0.07, rs=42, transform=False,
+              device='cpu', max_depth=6)
+    train_catboost(X_train, y_train, X_test, y_test, estimators=3000, lr=1 / 10, max_depth=6,
+                   l2=5, eval_metric="R2", one_hot_max_size=1000, od_type="Iter", od_wait=0,
+                   transform=False, verbose=False, data_in_leaf=1)
     '''
     preprocessing functions ()
     feature engineering()

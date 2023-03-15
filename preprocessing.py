@@ -1,13 +1,17 @@
 #Functions to be used for preprocessing
+import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler #For Data normalization
 from sklearn.model_selection import train_test_split #To split train test data
 from sklearn import preprocessing # label encode neighborhood
+import matplotlib as plt
+
 
 # Define the function to fill missing values
 def fill_missing_values(df):
 
-  ''' Fills missing values in data frame.
+  '''
+  Fills missing values in data frame.
   Null values in last_review & reviews_per_month coincide with each other indicating 
   that the listing never had a review
   This implies it is logical to fill reviews_per_month with 0 and last_review with the minimum review date'''
@@ -92,13 +96,13 @@ def one_hot_data(df, cat_features):
     unique_categories += df[column].nunique()
 
   df_encoded = pd.get_dummies(df, columns=cat_features)
-  
+
   encoded_columns = list(df_encoded.columns[len(df.columns)+ unique_categories - 1::-1][:unique_categories])
 
   return df_encoded, encoded_columns
 
 # Define the function to conduct the label encoding for the categorical features
-def encode_data(df,cat_features): 
+def encode_data(df,cat_features):
     '''label encoding encodes categorical selected categorical features
         Returns: (eg:0,1,2...)
         ------------------
@@ -126,12 +130,12 @@ def plot_density_per_num_column(df,numerical_features):
     ax = fig.add_subplot(rows,cols,i+1)
     df.loc[:,fea_name].hist(color='green',alpha=0.5,rwidth=0.8, density=True,
                             grid=False,ax=ax, bins=20)
-    plt.axvline(df.loc[:,fea_name].mean(), 
+    plt.axvline(df.loc[:,fea_name].mean(),
                 color='r',linestyle=':',label = 'mean')
-    plt.axvline(df.loc[:,fea_name].median(), color='b', linestyle='-.', 
+    plt.axvline(df.loc[:,fea_name].median(), color='b', linestyle='-.',
                 label = 'median')
     plt.legend()
     #df.loc[:,fea_name].plot(kind='density', color='green')
     ax.set_title("Histogram of " + fea_name)
-    
+
   plt.show()
