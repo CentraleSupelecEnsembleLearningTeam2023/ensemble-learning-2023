@@ -113,3 +113,25 @@ def encode_data(df,cat_features):
         df_encoded[column] = le.transform(df_encoded[column])
 
     return df_encoded
+
+# Define the function that plots the distribution of numerical features
+def plot_density_per_num_column(df,numerical_features):
+  '''Function to plot the distribution of numerical features
+  '''
+  cols = 2
+  rows = int(np.ceil(len(num_features)/cols))
+
+  fig = plt.figure(figsize=(6*cols,5*rows))
+  for i, fea_name in enumerate(numerical_features):
+    ax = fig.add_subplot(rows,cols,i+1)
+    df.loc[:,fea_name].hist(color='green',alpha=0.5,rwidth=0.8, density=True,
+                            grid=False,ax=ax, bins=20)
+    plt.axvline(df.loc[:,fea_name].mean(), 
+                color='r',linestyle=':',label = 'mean')
+    plt.axvline(df.loc[:,fea_name].median(), color='b', linestyle='-.', 
+                label = 'median')
+    plt.legend()
+    #df.loc[:,fea_name].plot(kind='density', color='green')
+    ax.set_title("Histogram of " + fea_name)
+    
+  plt.show()
