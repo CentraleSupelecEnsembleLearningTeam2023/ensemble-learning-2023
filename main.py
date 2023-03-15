@@ -33,6 +33,7 @@ def train_models(X_train, y_train, X_test, y_test):
     #train_decision_tree(X_train,y_train,X_test,y_test,max_depth= None,min_samples_split = 2,cross_val = False,grid_search = False,transform = False)
     #train_random_forest(X_train,y_train,X_test,y_test,estimators = 100,max_depth= None,min_samples_split = 2,cross_val = False,grid_search = False, transform = False)
     train_ensemble_models(X_train,y_train)
+    train_lgbm(X_train,y_train,X_test,y_test)
 
 """
 This is the main module to run the script and functions defined 
