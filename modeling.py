@@ -140,3 +140,21 @@ def train_ensemble_models(X_train, y_train):
   cvResFacet.add_legend()
 
   return cvResDf
+
+
+def train_lgbm(X_train,y_train,X_test,y_test,estimators = 200, lr = 0.07, n_jobs = -1, rs = 42,
+               transform = False):
+  from lightgbm import LGBMRegressor #Light Gradient Boosting Machine Learning Regressor
+  import lightgbm as lgb
+
+  lgbm_reg = LGBMRegressor(n_estimators = estimators, learning_rate = lr, n_jobs = n_jobs, random_state = rs)
+  lgbm_reg.fit(X_train, y_train)
+
+  # Predict log_SalePrice for the variables in the training set
+  y_pred_train = lgbm_reg.predict(X_train)
+  reg_metrics(y_train,lgbm_reg.predict(X_train),y_test,lgbm_reg.predict(X_test),transform = transform)
+
+  lgb.plot_importance(lgbm_reg,max_num_features= 25)
+  plt.show()
+
+  return lgbm_reg
