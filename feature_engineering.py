@@ -114,3 +114,56 @@ def min_landmark_distance(df_lat, df_long, df_land):
   min_distance_from_landmarks = [min(x) for x in distance_from_landmarks]
   
   return min_distance_from_landmarks
+
+def clean_string(line,stopwords): 
+
+  '''Function to clean text in "name" column to remove common stop words and remove punctuation 
+  and other irrelevant information
+  '''
+  import re
+
+  line = re.sub(r'[^\w\s]',"",line) #removes punctuation
+  line = [word.lower() for word in line.split(" ") if (len(word)>0) & (word.lower() not in stopwords)] #Each lines is then split into words
+  #by parsing blank space. any word that is a stop word is remove and then lower case for better gouping.
+
+  return ' '.join(line) # the output is list of words due to the parsing op
+
+def tokenize_text(df_train, stopwords, df_test = 0,test = False,min_df = 2,text_processed = True):
+
+  '''Create Features of from "name" text that are token counts of the collection
+  of text in the the entire dataframe using a CountVectorizer. The function will
+  return a pandas dataframe of counts of all collection of tokens and their counts
+  per listing. If a test set is specified, the process will also be made for a test 
+  set.
+  '''
+  from sklearn.feature_extraction.text import CountVectorizer
+  count_vect = CountVectorizer(min_df=min_df)
+
+  #clean text if not yet processed
+  if text_processed == False:
+    df_train['name'] = [clean_string(text,stopwords) for text in list(df_train['name'])]
+
+  #fit data to training set
+  X_train_counts = count_vect.fit_transform(df_train['name'])
+
+  #create list of column names of tokens
+  token_columns = []
+  for column in count_vect.get_feature_names_out():
+    token_columns.append("token_"+column)
+
+  #covert count vector into a Pandas DataFrame (to be able to merge with rest of features)
+  count_vec_df_train = pd.DataFrame(X_train_counts.todense(), columns=token_columns,index = df_train.index)
+
+  if test == True:
+
+    if text_processed == False:
+      df_test['name'] = [clean_string(text,stopwords) for text in list(df_test['name'])]
+
+    X_test_counts = count_vect.transform(df_test['name'])
+    print("Train shape:", X_train_counts.shape, "Test shape:", X_test_counts.shape)
+    count_vec_df_test = pd.DataFrame(X_test_counts.todense(), columns=token_columns,index = df_test.index)
+    return  count_vec_df_train, count_vec_df_test
+
+  else:
+    print("Train shape:", X_train_counts.shape)
+    return count_vec_df_train
