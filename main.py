@@ -55,21 +55,22 @@ def add_engineered_features(df,features):
     return df_transformed
 
 def preprocess_data(df,columns_to_keep,cat_features,num_features,plot_dist = False,transform = True,encode = False,
-                    one_hot_features = None, test_size  = 0.2):
-  '''
-  Function to preprocess data for modelling
+                    one_hot_features = None,test_size = 0.2,vectorize_text = False,min_df = 2):
+  '''Function to preprocess data for modelling
   Parameters:
   -----------------------
   df - dataframe to preprocess
   columns_to_keep - columns to be used for modelling
   cat_features - categorical features (must be in columns_to_keep)
-  num_features  - numerical features (must be in columns_to_keep)
+  num_features  - nuemerical features (must be in columns_to_keep)
   plot_dist - Boolean if want to view distribution of numerical data after transformation
   tranform - Boolean if numerical data to be log transformed
   encode - Boolean if categorical data to be encoded
-  one_hot_features - Boolean if enode is True, features to be 1hot encoded. rest of categorical features
+  one_hot_features - if enode is True, features to be 1hot encoded. rest of categorical features 
                     will be encoded into numerical data
   test_size - size of test set
+  vectorize_text - Boolean if "name" column to be tokenized ("name" must be in categorical features)
+  min_df - minimum frequency of token in order to exist in collection of tokens
 
   Returns:
   -------------------------
@@ -77,6 +78,8 @@ def preprocess_data(df,columns_to_keep,cat_features,num_features,plot_dist = Fal
   X_test - test features
   y_train - training target
   y_test - test target
+
+
   '''
   df_transformed = df.copy()
   kept_columns = columns_to_keep.copy()
@@ -102,6 +105,20 @@ def preprocess_data(df,columns_to_keep,cat_features,num_features,plot_dist = Fal
   
   #split data into train and test set
   X_train,X_test,y_train,y_test = split_data(df_transformed, columns_to_keep = kept_columns,test_size = test_size)
+
+  if vectorize_text == True:
+    assert 'name' in X_train.columns #ensures name column in columns to vectorize
+
+    count_vec_df_train, count_vec_df_test = tokenize_text(df_train = X_train, df_test = X_test,
+                                                          test = True,min_df = min_df,
+                                                          text_processed = False,stopwords = stopwords_ENG) #tokenize "name" field
+
+    X_train = pd.concat([X_train,count_vec_df_train],axis = 1) #concats train token features to existings train features
+    X_test = pd.concat([X_test,count_vec_df_test],axis = 1) #concats test token features to existings test features 
+
+    #drops "name" column
+    X_train.drop(columns = ['name'],inplace = True)
+    X_test.drop(columns = ['name'],inplace = True)
   
   return X_train,y_train, X_test, y_test
 
@@ -111,16 +128,16 @@ if __name__ == "__main__":
     df = pd.read_csv(path, sep=',')
 
     #add engineered features
-    df = add_engineered_features(df,['recency','min_landmark_distance','count_words_in_listing'])
+    df = add_engineered_features(df,['recency','min_landmark_distance'])
 
     #columns to keep and define numerical and categorical
-    keepcolumns = ['price','minimum_nights', 'number_of_reviews', 'neighbourhood_group',
+    keepcolumns = ['price','name','minimum_nights', 'number_of_reviews', 'neighbourhood_group',
        'room_type','calculated_host_listings_count', 'reviews_per_month', 'neighbourhood',
        'availability_365','last_review_recency','count_words_in_listing','min_distance_from_landmark']
 
     num_features = ['price','minimum_nights','number_of_reviews','reviews_per_month',
-                'calculated_host_listings_count','availability_365','last_review_recency',
-                'count_words_in_listing','min_distance_from_landmark']
+                'calculated_host_listings_count','availability_365','last_review_recency','count_words_in_listing',
+                'min_distance_from_landmark']
     
     cat_features = ['neighbourhood_group','neighbourhood','room_type']
     
@@ -128,16 +145,17 @@ if __name__ == "__main__":
     X_train_encoded,y_train_encoded, X_test_encoded, y_test_encoded = preprocess_data(df, columns_to_keep=keepcolumns, cat_features=cat_features,
                                                    num_features=num_features, plot_dist=False, encode=True,
                                                    one_hot_features=['neighbourhood_group','room_type'],
-                                                   test_size=0.2)
+                                                   test_size=0.2, vectorize_text = False, min_df = 2)
     
     X_train, y_train, X_test, y_test = preprocess_data(df, columns_to_keep=keepcolumns, cat_features=cat_features,
                                                    num_features=num_features, plot_dist=False, encode=False,
                                                    one_hot_features=['neighbourhood_group','room_type'],
-                                                   test_size=0.2)
+                                                   test_size=0.2, vectorize_text = False, min_df = 2)
 
     #train models
     # print("Linear Regression Summary:")
-    # train_linear_reg(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded, cross_val = False)
+    # train_linear_reg(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded, cross_val = False,
+    #                 transform = False)
       
     # print("Decision Tree Summary:")
     # train_decision_tree(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,max_depth= None,
@@ -162,7 +180,7 @@ if __name__ == "__main__":
     
     print("CatBoost Summary:")
     train_catboost(X_train, y_train, X_test, y_test, estimators=3000, lr=1 / 10, max_depth=6,
-                   l2=5, eval_metric="R2", one_hot_max_size=1000, od_type="Iter", od_wait=0,
+                   l2=5, eval_metric="R2", one_hot_max_size=1000, od_type= None, od_wait= None,
                    transform=False, verbose=False, data_in_leaf=1,cat_features = cat_features)
     
  
