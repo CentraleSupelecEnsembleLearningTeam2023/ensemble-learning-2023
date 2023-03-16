@@ -105,20 +105,6 @@ def preprocess_data(df,columns_to_keep,cat_features,num_features,plot_dist = Fal
   
   return X_train,y_train, X_test, y_test
 
-"""
-considering multiple models, and some have different preoricessing, e.g. catboost,
-we should abandon this function and move the functions to the main module
-"""
-def train_models(X_train, y_train, X_test, y_test):
-    #train_linear_reg(X_train, y_train, X_test, y_test, cross_val = False)
-    #train_decision_tree(X_train,y_train,X_test,y_test,max_depth= None,min_samples_split = 2,cross_val = False,grid_search = False,transform = False)
-    #train_random_forest(X_train,y_train,X_test,y_test,estimators = 100,max_depth= None,min_samples_split = 2,cross_val = False,grid_search = False, transform = False)
-    train_ensemble_models(X_train,y_train)
-    train_lgbm(X_train,y_train,X_test,y_test)
-
-"""
-This is the main module to run the script and functions defined 
-"""
 if __name__ == "__main__":
     # read the csv file as a dataframe
     path = 'new-york-city-airbnb-open-data/AB_NYC_2019.csv'
@@ -143,24 +129,47 @@ if __name__ == "__main__":
                                                    num_features=num_features, plot_dist=False, encode=True,
                                                    one_hot_features=['neighbourhood_group','room_type'],
                                                    test_size=0.2)
+    
     X_train, y_train, X_test, y_test = preprocess_data(df, columns_to_keep=keepcolumns, cat_features=cat_features,
-                                                   num_features=num_features, plot_dist=False, encode=True,
+                                                   num_features=num_features, plot_dist=False, encode=False,
                                                    one_hot_features=['neighbourhood_group','room_type'],
                                                    test_size=0.2)
 
     #train models
-    train_ensemble_models(X_train_encoded, y_train_encoded)
+    # print("Linear Regression Summary:")
+    # train_linear_reg(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded, cross_val = False)
+      
+    # print("Decision Tree Summary:")
+    # train_decision_tree(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,max_depth= None,
+    #                     min_samples_split = 2, cross_val = False,grid_search = False,transform = False)
+      
+    # print("Random Forest Summary:")
+    # train_random_forest(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,
+    #                     estimators = 100,max_depth= None,
+    #                     min_samples_split = 2,cross_val = False,grid_search = False, transform = False)
+    
+    print("Ensemble Summary:")
+    train_ensemble_models(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded)
+    
+    print("LGBM Summary:")
+    train_lgbm(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,
+               estimators = 200, lr = 0.07, n_jobs = -1, rs = 42,
+               transform = False)
 
-    train_lgbm(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded, estimators=200, lr=0.07, n_jobs=-1, rs=42,
-               transform=False)
-    train_xgb(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded, estimators=200, lr=0.07, rs=42, transform=False,
-              device='cpu', max_depth=6)
+    print("XGBoost Summary:")
+    train_xgb(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded, 
+              estimators=200, lr=0.07, rs=42, transform=False, device='cpu', max_depth=6)
+    
+    print("CatBoost Summary:")
     train_catboost(X_train, y_train, X_test, y_test, estimators=3000, lr=1 / 10, max_depth=6,
                    l2=5, eval_metric="R2", one_hot_max_size=1000, od_type="Iter", od_wait=0,
-                   transform=False, verbose=False, data_in_leaf=1)
+                   transform=False, verbose=False, data_in_leaf=1,cat_features = cat_features)
+    
+ 
     '''
     preprocessing functions ()
     feature engineering()
     train()
     etc.
     '''
+

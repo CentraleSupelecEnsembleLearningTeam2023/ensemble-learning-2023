@@ -11,20 +11,33 @@ def reg_metrics(y_train,pred_train,y_test,pred_test,transform = False):
   '''
   from sklearn.metrics import mean_squared_error, r2_score
 
-  if transform == True:
-    y_train,pred_train,y_test,pred_test = np.e**y_train,np.e**pred_train,np.e**y_test,np.e**pred_test
-
+  print("Log(Price) Metrics:")
   rmse_train = np.sqrt(mean_squared_error(y_train, pred_train))
   r2_train = r2_score(y_train, pred_train)
   print("Training RMSE:", rmse_train)
   print("Training R²:", r2_train)
 
-  print("\n")
-
   rmse_test = np.sqrt(mean_squared_error(y_test, pred_test))
   r2_test = r2_score(y_test, pred_test)
   print("Out-of-sample RMSE:", rmse_test)
   print("Out-of-sample R²:", r2_test)
+
+  print("\n")
+
+  if transform == True:
+    y_train,pred_train,y_test,pred_test = np.e**y_train,np.e**pred_train,np.e**y_test,np.e**pred_test
+    print("Price Metrics:")
+    rmse_train = np.sqrt(mean_squared_error(y_train, pred_train))
+    r2_train = r2_score(y_train, pred_train)
+    print("Training RMSE:", rmse_train)
+    print("Training R²:", r2_train)
+
+    rmse_test = np.sqrt(mean_squared_error(y_test, pred_test))
+    r2_test = r2_score(y_test, pred_test)
+    print("Out-of-sample RMSE:", rmse_test)
+    print("Out-of-sample R²:", r2_test)
+
+    print("\n")
 
 def train_linear_reg(X_train,y_train,X_test,y_test,cross_val = False, transform = False):
   from sklearn.model_selection import cross_val_score, KFold
@@ -178,13 +191,13 @@ def train_xgb(X_train, y_train, X_test, y_test, estimators = 200, lr = 0.07, rs 
     xgb_reg = xgb.XGBRegressor(n_estimators=estimators, learning_rate=lr, random_state= rs,
                             tree_method = 'gpu_hist', max_depth = max_depth)
   else:
-    xgb_reg = xgb.XGBRegressor(n_estimators=estimators, learning_rate=lr, random_state= rs)
+    xgb_reg = xgb.XGBRegressor(n_estimators=estimators, learning_rate=lr, random_state= rs,
+                               max_depth = max_depth)
 
 
   # Fit model to training set
   xgb_reg.fit(X_train, y_train)
 
-  y_pred_train = xgb_reg.predict(X_train)
   reg_metrics(y_train,xgb_reg.predict(X_train),y_test,xgb_reg.predict(X_test),transform = transform)
 
   xgb.plot_importance(xgb_reg, max_num_features = 25, title = "Top 25 features")
@@ -195,7 +208,7 @@ def train_xgb(X_train, y_train, X_test, y_test, estimators = 200, lr = 0.07, rs 
 ## training catboost
 def train_catboost(X_train, y_train, X_test, y_test, estimators=3000, lr=1 / 10, max_depth=6,
                    l2=5, eval_metric="R2", one_hot_max_size=1000, od_type="Iter", od_wait=0,
-                   transform=False, verbose=False, data_in_leaf=1):
+                   transform=False, verbose=False, data_in_leaf=1, cat_features = []):
   '''
   :param estimators: number of estimators
   :param lr: learning rate
