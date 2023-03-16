@@ -133,10 +133,10 @@ if __name__ == "__main__":
     #columns to keep and define numerical and categorical
     keepcolumns = ['price','name','minimum_nights', 'number_of_reviews', 'neighbourhood_group',
        'room_type','calculated_host_listings_count', 'reviews_per_month', 'neighbourhood',
-       'availability_365','last_review_recency','count_words_in_listing','min_distance_from_landmark']
+       'availability_365','last_review_recency','min_distance_from_landmark']
 
     num_features = ['price','minimum_nights','number_of_reviews','reviews_per_month',
-                'calculated_host_listings_count','availability_365','last_review_recency','count_words_in_listing',
+                'calculated_host_listings_count','availability_365','last_review_recency',
                 'min_distance_from_landmark']
     
     cat_features = ['neighbourhood_group','neighbourhood','room_type']
