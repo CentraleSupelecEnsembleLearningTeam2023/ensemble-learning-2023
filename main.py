@@ -20,20 +20,35 @@ stopwords_ENG = stopwords.words('english')
 import pandas as pd
 
 
-def add_engineered_features(df):
+def add_engineered_features(df,features):
     '''
     Function to add features engineered in aggregrate manner
     '''
     # Read in the new york subway stations location data data
     # Source: https://data.ny.gov/en/Transportation/NYC-Transit-Subway-Station-Map/6xm2-7ffy
     stations = pd.read_csv('new-york-city-airbnb-open-data/NYC_Transit_Subway_Station_Location.csv')
+    landmark = pd.read_csv('new-york-city-airbnb-open-data/landmarks.csv')
     #from tqdm import tqdm, tqdm_pandas
     #tqdm.pandas()
 
     df_transformed = df.copy()
-    df_transformed['last_review_recency'] = recency(df_transformed)
-    df_transformed['count_words_in_listing'] = count_words_in_listing(df_transformed)
-    df_transformed['num_of_stations_nearby'] = df_transformed.apply(lambda row: numstation(row['latitude'], row['longitude'], stations), axis = 1)
+
+    for feature in features:
+
+      if feature == 'recency':
+        df_transformed['last_review_recency'] = recency(df_transformed)
+
+      if feature == 'min_landmark_distance':
+
+        df_transformed['min_distance_from_landmark'] = min_landmark_distance(df_transformed['latitude'], df_transformed['longitude'], landmark)
+
+      if feature == 'count_words_in_listing':
+        df_transformed['count_words_in_listing'] = count_words_in_listing(df_transformed)
+
+      
+      if feature == 'numstation':
+        df_transformed['num_of_stations_nearby'] = df_transformed.apply(lambda row: numstation(row['latitude'], row['longitude'], stations), axis = 1)
+
     # Use the following line if you want to track the progress
     #df_transformed['num_of_stations_nearby'] = df_transformed.progress_apply(lambda row: numstation(row['latitude'], row['longitude'], stations), axis = 1)
 
@@ -48,7 +63,7 @@ def preprocess_data(df,columns_to_keep,cat_features,num_features,plot_dist = Fal
   df - dataframe to preprocess
   columns_to_keep - columns to be used for modelling
   cat_features - categorical features (must be in columns_to_keep)
-  num_features  - nuemerical features (must be in columns_to_keep)
+  num_features  - numerical features (must be in columns_to_keep)
   plot_dist - Boolean if want to view distribution of numerical data after transformation
   tranform - Boolean if numerical data to be log transformed
   encode - Boolean if categorical data to be encoded
@@ -110,16 +125,16 @@ if __name__ == "__main__":
     df = pd.read_csv(path, sep=',')
 
     #add engineered features
-    df = add_engineered_features(df)
+    df = add_engineered_features(df,['recency','min_landmark_distance','count_words_in_listing'])
 
     #columns to keep and define numerical and categorical
     keepcolumns = ['price','minimum_nights', 'number_of_reviews', 'neighbourhood_group',
        'room_type','calculated_host_listings_count', 'reviews_per_month', 'neighbourhood',
-       'availability_365','last_review_recency','count_words_in_listing','num_of_stations_nearby']
+       'availability_365','last_review_recency','count_words_in_listing','min_distance_from_landmark']
 
     num_features = ['price','minimum_nights','number_of_reviews','reviews_per_month',
                 'calculated_host_listings_count','availability_365','last_review_recency',
-                'count_words_in_listing','num_of_stations_nearby']
+                'count_words_in_listing','min_distance_from_landmark']
     
     cat_features = ['neighbourhood_group','neighbourhood','room_type']
     
