@@ -69,3 +69,48 @@ def numstation(la, lo, df2):
     count = np.sum(distances <= 1000)
     
     return count
+
+def min_landmark_distance(df_lat, df_long, df_land):
+
+  '''Create features that calculates the minimum distance between a listing
+  and one of the Top 13 landmarks. The function will calculate the distance of a listing
+  from from all the landmarks and output the distance to the closest landmark. Uses 
+  widely used methodology called Haversine to calculate the distance between the coordinates
+  '''
+
+  from math import sin, cos, sqrt, atan2, radians
+  
+  df_lat = df_lat.apply(radians) #convert latitude of all listings to radians
+  df_long = df_long.apply(radians) #convert longitude of all listings to radians
+  R = 6372 #radius of Earth
+  i = 0
+  
+  #iterate over landmarks
+  for landmark_lat,landmark_long in df_land[['latitude','longitude']].values:
+    landmark_lat = radians(landmark_lat) #convert latitude of landmark to radians
+    landmark_long = radians(landmark_long) #convert longitude of landmark to radians
+  
+    dlon = landmark_long - df_long #difference between longitude of listings and landmark
+    dlat = landmark_lat - df_lat #difference between latitude of listings and landmark
+    
+    #Usese the Haversine formula for calculating distance between cpprdinates
+    a = ((dlat / 2).apply(sin))**2 + df_lat.apply(cos) * cos(landmark_lat) * ((dlon / 2).apply(sin))**2
+    c = 2* a.apply(lambda x: atan2(sqrt(x),sqrt(1-x)))
+
+    distance_haversine_formula = R * c
+    #creates a tuple with harvesine distance between all listings and first landmark
+    if i == 0:
+      distance_from_landmarks = tuple(distance_haversine_formula)
+    #zips distances from second landmarks
+    elif i == 1:
+      distance_from_landmarks = zip(distance_from_landmarks,tuple(distance_haversine_formula))
+    #zips distances from rest of landmarks
+    else:
+      distance_from_landmarks = list(map(lambda x: list(x[0]) + [x[1]],list(zip(distance_from_landmarks,distance_haversine_formula))))
+
+    i +=1
+
+  #takes the distance to the closest landmark for each respective listing
+  min_distance_from_landmarks = [min(x) for x in distance_from_landmarks]
+  
+  return min_distance_from_landmarks
