@@ -207,7 +207,7 @@ def train_xgb(X_train, y_train, X_test, y_test, estimators = 200, lr = 0.07, rs 
 
 ## training catboost
 def train_catboost(X_train, y_train, X_test, y_test, estimators=3000, lr=1 / 10, max_depth=6,
-                   l2=5, eval_metric="R2", one_hot_max_size=1000, od_type="Iter", od_wait=0,
+                   l2=5, eval_metric="R2", one_hot_max_size=1000, od_type= None, od_wait= None,
                    transform=False, verbose=False, data_in_leaf=1, cat_features = []):
   '''
   :param estimators: number of estimators
