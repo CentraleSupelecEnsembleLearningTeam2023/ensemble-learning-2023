@@ -85,6 +85,7 @@ def preprocess_data(df,columns_to_keep,cat_features,num_features,plot_dist = Fal
   df_transformed = df.copy()
   kept_columns = columns_to_keep.copy()
   df_transformed = fill_missing_values(df_transformed) # missing value imputation
+  df_transformed = df_transformed[df_transformed['price'] > 0]  # 11 rows with price as 0, keep only entries with price > 0
   if transform == True:
     df_transformed = log_data(df_transformed,num_features) #log tranforms numerical features
   
@@ -191,11 +192,5 @@ if __name__ == "__main__":
                    l2=5, eval_metric="R2", one_hot_max_size=1000, od_type= None, od_wait= None,
                    transform=False, verbose=False, data_in_leaf=1,cat_features = cat_features)
     
- 
-    '''
-    preprocessing functions ()
-    feature engineering()
-    train()
-    etc.
-    '''
+
 

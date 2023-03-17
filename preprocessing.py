@@ -40,10 +40,10 @@ def transform_boxCox(df,num_features):
 
 #Define the function to log transform data
 def log_data(df,num_features):
-  '''returns natural log of numerical data
+  '''
+  returns natural log of numerical data
   '''
   df_transformed = df.copy()
-
   for col in num_features:
     df_transformed[col] = np.log(df_transformed[col]+1)
 
