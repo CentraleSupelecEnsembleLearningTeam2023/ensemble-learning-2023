@@ -133,7 +133,7 @@ def train_ensemble_models(X_train, y_train):
 
   cv_results = []
   for regressor in regressors:
-      cv_results.append(cross_val_score(regressor, X_train, y_train,
+      cv_results.append(cross_val_score(regressor, X_train, y_train.values.ravel(),
                                         scoring='r2', cv=kfold, n_jobs=-1))
       print("{} Regressor CV complete!".format(regressor))
   cv_means = []
@@ -152,6 +152,7 @@ def train_ensemble_models(X_train, y_train):
   cvResFacet.map(sns.barplot,'cv_mean','algorithm',**{'xerr':cv_std},
                palette='muted')
   cvResFacet.add_legend()
+  plt.show()
 
   return cvResDf
 

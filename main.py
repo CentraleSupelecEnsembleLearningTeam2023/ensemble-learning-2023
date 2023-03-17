@@ -7,6 +7,7 @@ from preprocessing import *
 from datetime import datetime
 from modeling import *
 from feature_engineering import *
+import argparse
 
 
 import re
@@ -123,6 +124,12 @@ def preprocess_data(df,columns_to_keep,cat_features,num_features,plot_dist = Fal
   return X_train,y_train, X_test, y_test
 
 if __name__ == "__main__":
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--fullbenchmark", help="include all algorithms",
+                    action="store_true")
+    args = parser.parse_args()
+
     # read the csv file as a dataframe
     path = 'new-york-city-airbnb-open-data/AB_NYC_2019.csv'
     df = pd.read_csv(path, sep=',')
@@ -145,12 +152,12 @@ if __name__ == "__main__":
     X_train_encoded,y_train_encoded, X_test_encoded, y_test_encoded = preprocess_data(df, columns_to_keep=keepcolumns, cat_features=cat_features,
                                                    num_features=num_features, plot_dist=False, encode=True,
                                                    one_hot_features=['neighbourhood_group','room_type'],
-                                                   test_size=0.2, vectorize_text = False, min_df = 2)
-    
+                                                   test_size=0.2, vectorize_text = True, min_df = 2) 
+  
     X_train, y_train, X_test, y_test = preprocess_data(df, columns_to_keep=keepcolumns, cat_features=cat_features,
-                                                   num_features=num_features, plot_dist=False, encode=False,
-                                                   one_hot_features=['neighbourhood_group','room_type'],
-                                                   test_size=0.2, vectorize_text = False, min_df = 2)
+                                                 num_features=num_features, plot_dist=False, encode=False,
+                                                 one_hot_features=['neighbourhood_group','room_type'],
+                                                 test_size=0.2, vectorize_text = True, min_df = 2)
 
     #train models
     # print("Linear Regression Summary:")
@@ -166,8 +173,9 @@ if __name__ == "__main__":
     #                     estimators = 100,max_depth= None,
     #                     min_samples_split = 2,cross_val = False,grid_search = False, transform = False)
     
-    print("Ensemble Summary:")
-    train_ensemble_models(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded)
+    if args.fullbenchmark:
+      print("Ensemble Summary:")
+      train_ensemble_models(X_train_encoded, y_train_encoded)
     
     print("LGBM Summary:")
     train_lgbm(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,
