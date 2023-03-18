@@ -170,8 +170,8 @@ if __name__ == "__main__":
     #                 transform = False)
       
     # print("Decision Tree Summary:")
-    # train_decision_tree(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,max_depth= None,
-    #                     min_samples_split = 2, cross_val = False,grid_search = False,transform = False)
+    # train_decision_tree(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,max_depth= 10,
+    #                     min_samples_split = 20, cross_val = False,grid_search = False,transform = False)
       
     # print("Random Forest Summary:")
     # train_random_forest(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,
@@ -189,7 +189,7 @@ if __name__ == "__main__":
 
     print("XGBoost Summary:")
     train_xgb(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded, 
-              estimators=200, lr=0.07, rs=42, transform=False, device='cpu', max_depth=6)
+              estimators=500, lr=0.1, rs=42, transform=False, device='cpu', max_depth=10)
     
     print("CatBoost Summary:")
     train_catboost(X_train, y_train, X_test, y_test, estimators=3000, lr=1 / 10, max_depth=6,
