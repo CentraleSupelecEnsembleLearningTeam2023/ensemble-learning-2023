@@ -225,7 +225,11 @@ def train_catboost(X_train, y_train, X_test, y_test, estimators=3000, lr=1 / 10,
   :return: the trained CatBoost regressor object
   '''
   from catboost import CatBoostRegressor, Pool
+  from sklearn.model_selection import train_test_split
   # CatBoost Machine Learning Regressor that solves for Categorical feature using a permutation driven alternative
+  
+  #Data split into a train/cross_val pool
+  X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2,random_state = 123)
 
   # Defition of training plot
   train_dataset = Pool(data=X_train,
@@ -233,8 +237,8 @@ def train_catboost(X_train, y_train, X_test, y_test, estimators=3000, lr=1 / 10,
                        cat_features=cat_features)
 
   # Definition of Cross-Validation Pool
-  eval_dataset = Pool(data=X_test,
-                      label=y_test,
+  eval_dataset = Pool(data=X_val,
+                      label=y_val,
                       cat_features=cat_features)
 
   # Initialize CatBoostClassifier
