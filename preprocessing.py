@@ -8,21 +8,22 @@ import matplotlib as plt
 
 
 # Define the function to fill missing values
-def fill_missing_values(df):
+def fill_missing_values(df,columns):
 
-  '''
-  Fills missing values in data frame.
+  ''' Fills missing values in data frame.
   Null values in last_review & reviews_per_month coincide with each other indicating 
   that the listing never had a review
   This implies it is logical to fill reviews_per_month with 0 and last_review with the minimum review date'''
 
-  df['reviews_per_month'] = df['reviews_per_month'].fillna(0) #fill null reviews per months by 0
-  df['last_review'] = pd.to_datetime(df['last_review']) #convert to datetime
-  df['last_review'] = df['last_review'].fillna(min(df.last_review)) #fill in with last review with the most recent date in dataset
-  df['name'] = df['name'].fillna('') #fill missing listing name within no name
+  if 'reviews_per_month' in columns:
+    df['reviews_per_month'] = df['reviews_per_month'].fillna(0) #fill null reviews per months by 0
+  if 'last_review' in columns:
+    df['last_review'] = pd.to_datetime(df['last_review']) #convert to datetime
+    df['last_review'] = df['last_review'].fillna(min(df.last_review)) #fill in with last review with the most recent date in dataset
+  if 'name' in columns:
+    df['name'] = df['name'].fillna('') #fill missing listing name within no name
 
   return df
-
 
 # Define the function to apply boxcox transformation
 def transform_boxCox(df,num_features):
