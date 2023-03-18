@@ -72,25 +72,20 @@ def preprocess_data(df,columns_to_keep,cat_features,num_features,plot_dist = Fal
   test_size - size of test set
   vectorize_text - Boolean if "name" column to be tokenized ("name" must be in categorical features)
   min_df - minimum frequency of token in order to exist in collection of tokens
-
   Returns:
   -------------------------
   X_train - training features
   X_test - test features
   y_train - training target
   y_test - test target
-
-
   '''
   df_transformed = df.copy()
   kept_columns = columns_to_keep.copy()
-  df_transformed = fill_missing_values(df_transformed,keepcolumns) # missing value imputation
   df_transformed = df_transformed[df_transformed['price'] > 0]  # 11 rows with price as 0, keep only entries with price > 0
+
   if transform == True:
-    df_transformed = log_data(df_transformed,num_features) #log tranforms numerical features
-  
-  df_transformed = scale_data(df_transformed,num_features) #scales numerical data
-  
+    df_transformed = log_data(df_transformed, num_features)
+
   if plot_dist ==True:
     plot_density_per_num_column(df_transformed,num_features) #plot dist numerical columns
 
@@ -107,6 +102,15 @@ def preprocess_data(df,columns_to_keep,cat_features,num_features,plot_dist = Fal
   
   #split data into train and test set
   X_train,X_test,y_train,y_test = split_data(df_transformed, columns_to_keep = kept_columns,test_size = test_size)
+
+  X_train = fill_missing_values(X_train,keepcolumns) # missing value imputation
+  X_test = fill_missing_values(X_test,keepcolumns)
+
+  X_features = num_features.copy()
+  X_features.remove('price')
+
+  X_train = scale_data(X_train,X_features) #scales numerical data
+  X_test = scale_data(X_test,X_features)
 
   if vectorize_text == True:
     assert 'name' in X_train.columns #ensures name column in columns to vectorize
