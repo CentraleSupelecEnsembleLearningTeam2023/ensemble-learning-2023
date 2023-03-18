@@ -45,7 +45,10 @@ def log_data(df,num_features):
   '''
   df_transformed = df.copy()
   for col in num_features:
-    df_transformed[col] = np.log(df_transformed[col]+1)
+    if col == 'price':
+        df_transformed[col] = np.log(df_transformed[col])
+    else:
+        df_transformed[col] = np.log(df_transformed[col]+1)
 
   return df_transformed
 
