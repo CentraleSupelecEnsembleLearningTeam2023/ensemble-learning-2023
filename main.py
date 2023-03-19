@@ -164,39 +164,51 @@ if __name__ == "__main__":
                                                  one_hot_features=['neighbourhood_group','room_type'],
                                                  test_size=0.2, vectorize_text = True, min_df = 2)
 
-    #train models
-    # print("Linear Regression Summary:")
-    # train_linear_reg(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded, cross_val = False,
-    #                 transform = False)
+    #train models - hyperparameters below found with grid search (except LGBM due to failed gridsearch)
+
+    summary_dict = {"model": [],"price_rmse_train": [],"price_r2_train":[],"price_rmse_test": [], "price_r2_test": []
+         ,"log_price_r2_train": [], "log_price_r2_test": []} #dictionry to store metrics
+
+    print("Linear Regression Summary:")
+    lr, train_summary = train_linear_reg(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded, cross_val = False,
+                    transform = False)
+    summary_dict = update_scores(summary_dict,train_summary,'Linear Regression')
       
-    # print("Decision Tree Summary:")
-    # train_decision_tree(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,max_depth= 10,
-    #                     min_samples_split = 20, cross_val = False,grid_search = False,transform = False)
-      
+    print("Decision Tree Summary:")
+    clf, train_summary = train_decision_tree(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,max_depth= 10,
+                        min_samples_split = 20, cross_val = False,grid_search = False,transform = False)
+    summary_dict = update_scores(summary_dict,train_summary,'Decision Tree')
+
+    print("Random Forest Summary:")
+    rf, train_summary = train_random_forest(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,
+                        estimators = 100,max_depth= 20,
+                        min_samples_split = 2,cross_val = False,grid_search = False, transform = False)
+    summary_dict = update_scores(summary_dict,train_summary,'Random Forest') 
 
     if args.fullbenchmark:
       print("Ensemble Summary:")
       train_ensemble_models(X_train_encoded, y_train_encoded)
     
     print("LGBM Summary:")
-    train_lgbm(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,
+    lgbm_reg, train_summary = train_lgbm(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,
                estimators = 200, lr = 0.07, n_jobs = -1, rs = 42,
                transform = False)
+    summary_dict = update_scores(summary_dict,train_summary,'LGBM')
 
     print("XGBoost Summary:")
-    train_xgb(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded, 
+    xgb_reg, train_summary = train_xgb(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded, 
               estimators=500, lr=0.1, rs=42, transform=False, device='cpu', max_depth=10)
-    
+    summary_dict = update_scores(summary_dict,train_summary,'XGBoost')
+
     print("CatBoost Summary:")
-    train_catboost(X_train, y_train, X_test, y_test, estimators=800, lr=1 / 10, max_depth=10,
+    cat_reg, summary_train = train_catboost(X_train, y_train, X_test, y_test, estimators=800, lr=1 / 10, max_depth=10,
                    l2=2, eval_metric="R2", one_hot_max_size=1000, od_type= None, od_wait= None,
                    transform=False, verbose=False, data_in_leaf=1,cat_features = cat_features)
-    
-    print("Random Forest Summary:")
-    train_random_forest(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,
-                        estimators = 100,max_depth= 20,
-                        min_samples_split = 2,cross_val = False,grid_search = False, transform = False)
-    
+    summary_dict = update_scores(summary_dict,train_summary,'CatBoost')
+
+    summary_df = pd.DataFrame(summary_dict) #convert dict to DataFrame
+    summary_df.to_csv('model_summary.csv') #Export metrics of all models trained to csv
+
     
 
 
