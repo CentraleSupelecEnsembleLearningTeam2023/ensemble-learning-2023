@@ -173,11 +173,7 @@ if __name__ == "__main__":
     # train_decision_tree(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,max_depth= 10,
     #                     min_samples_split = 20, cross_val = False,grid_search = False,transform = False)
       
-    # print("Random Forest Summary:")
-    # train_random_forest(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,
-    #                     estimators = 100,max_depth= None,
-    #                     min_samples_split = 2,cross_val = False,grid_search = False, transform = False)
-    
+
     if args.fullbenchmark:
       print("Ensemble Summary:")
       train_ensemble_models(X_train_encoded, y_train_encoded)
@@ -195,6 +191,12 @@ if __name__ == "__main__":
     train_catboost(X_train, y_train, X_test, y_test, estimators=800, lr=1 / 10, max_depth=10,
                    l2=2, eval_metric="R2", one_hot_max_size=1000, od_type= None, od_wait= None,
                    transform=False, verbose=False, data_in_leaf=1,cat_features = cat_features)
+    
+    print("Random Forest Summary:")
+    train_random_forest(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,
+                        estimators = 100,max_depth= 20,
+                        min_samples_split = 2,cross_val = False,grid_search = False, transform = False)
+    
     
 
 
