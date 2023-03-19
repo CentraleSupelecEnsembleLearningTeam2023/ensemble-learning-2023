@@ -143,3 +143,16 @@ def plot_density_per_num_column(df,numerical_features):
     ax.set_title("Histogram of " + fea_name)
 
   plt.show()
+
+# Define functions to remove the outliers
+def remove_outliers(df_transformed, column):
+    '''Function to remove outliers from the numerical features to ensure better visualize
+    the distribution of features.
+    '''
+
+    Q1 = df_transformed[column].quantile(0.25)
+    Q3 = df_transformed[column].quantile(0.75)
+    IQR = Q3 - Q1
+    lower_bound = Q1 - 1.5 * IQR
+    upper_bound = Q3 + 1.5 * IQR
+    return df_transformed[(df_transformed[column] > lower_bound) & (df_transformed[column] < upper_bound)]

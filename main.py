@@ -56,7 +56,7 @@ def add_engineered_features(df,features):
     return df_transformed
 
 def preprocess_data(df,columns_to_keep,cat_features,num_features,plot_dist = False,transform = True,encode = False,
-                    one_hot_features = None,test_size = 0.2,vectorize_text = False,min_df = 2):
+                    one_hot_features = None,test_size = 0.2,vectorize_text = False,min_df = 2, outliers = True):
   '''Function to preprocess data for modelling
   Parameters:
   -----------------------
@@ -72,6 +72,7 @@ def preprocess_data(df,columns_to_keep,cat_features,num_features,plot_dist = Fal
   test_size - size of test set
   vectorize_text - Boolean if "name" column to be tokenized ("name" must be in categorical features)
   min_df - minimum frequency of token in order to exist in collection of tokens
+  outliers - Boolean if False removes price outliers
   Returns:
   -------------------------
   X_train - training features
@@ -82,6 +83,9 @@ def preprocess_data(df,columns_to_keep,cat_features,num_features,plot_dist = Fal
   df_transformed = df.copy()
   kept_columns = columns_to_keep.copy()
   df_transformed = df_transformed[df_transformed['price'] > 0]  # 11 rows with price as 0, keep only entries with price > 0
+
+  if outliers == False:
+    df_transformed = remove_outliers(df_transformed, 'price')
 
   if transform == True:
     df_transformed = log_data(df_transformed, num_features)
@@ -169,10 +173,10 @@ if __name__ == "__main__":
     summary_dict = {"model": [],"price_rmse_train": [],"price_r2_train":[],"price_rmse_test": [], "price_r2_test": []
          ,"log_price_r2_train": [], "log_price_r2_test": []} #dictionry to store metrics
 
-    print("Linear Regression Summary:")
-    lr, train_summary = train_linear_reg(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded, cross_val = False,
-                    transform = False)
-    summary_dict = update_scores(summary_dict,train_summary,'Linear Regression')
+    # print("Linear Regression Summary:")
+    # lr, train_summary = train_linear_reg(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded, cross_val = False,
+    #                 transform = False)
+    # summary_dict = update_scores(summary_dict,train_summary,'Linear Regression')
       
     print("Decision Tree Summary:")
     clf, train_summary = train_decision_tree(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,max_depth= 10,
