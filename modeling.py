@@ -48,7 +48,7 @@ def update_scores(summary_dict, train_summary,model_name = ''):
   Parameters:
   -----------------
   summary_dict - a dictionary storing the summary metrics obtained from reg_metrics
-  train_summary - summary statistics obtained from reg_metrics in a tuple
+  train_summary - summary statistics obtained from reg_metrics
   model_name - the name of the model trained to obtain train_summary
 
   Output:
