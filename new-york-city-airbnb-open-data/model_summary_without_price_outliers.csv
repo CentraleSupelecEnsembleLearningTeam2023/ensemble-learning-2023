@@ -1,0 +1,6 @@
+,model,price_rmse_train,price_r2_train,price_rmse_test,price_r2_test,log_price_r2_train,log_price_r2_test
+0,Decision Tree,42.496,0.611,46.243,0.539,0.679,0.605
+1,Random Forest,40.519,0.646,44.757,0.568,0.716,0.638
+2,LGBM,39.95,0.656,43.0,0.601,0.717,0.67
+3,XGBoost,32.666,0.77,42.548,0.609,0.819,0.673
+4,CatBoost,35.195,0.733,42.241,0.615,0.789,0.681
