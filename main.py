@@ -192,7 +192,7 @@ if __name__ == "__main__":
               estimators=500, lr=0.1, rs=42, transform=False, device='cpu', max_depth=10)
     
     print("CatBoost Summary:")
-    train_catboost(X_train, y_train, X_test, y_test, estimators=3000, lr=1 / 10, max_depth=10,
+    train_catboost(X_train, y_train, X_test, y_test, estimators=800, lr=1 / 10, max_depth=10,
                    l2=2, eval_metric="R2", one_hot_max_size=1000, od_type= None, od_wait= None,
                    transform=False, verbose=False, data_in_leaf=1,cat_features = cat_features)
     
