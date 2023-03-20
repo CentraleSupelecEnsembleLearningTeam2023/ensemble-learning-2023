@@ -171,18 +171,18 @@ if __name__ == "__main__":
 
     print("Linear Regression Summary:")
     lr, train_summary = train_linear_reg(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded, cross_val = False,
-                    transform = False)
+                    transform = True)
     summary_dict = update_scores(summary_dict,train_summary,'Linear Regression')
       
     print("Decision Tree Summary:")
     clf, train_summary = train_decision_tree(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,max_depth= 10,
-                        min_samples_split = 20, cross_val = False,grid_search = False,transform = False)
+                        min_samples_split = 20, cross_val = False,grid_search = False,transform = True)
     summary_dict = update_scores(summary_dict,train_summary,'Decision Tree')
 
     print("Random Forest Summary:")
     rf, train_summary = train_random_forest(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,
                         estimators = 100,max_depth= 20,
-                        min_samples_split = 2,cross_val = False,grid_search = False, transform = False)
+                        min_samples_split = 2,cross_val = False,grid_search = False, transform = True)
     summary_dict = update_scores(summary_dict,train_summary,'Random Forest') 
 
     if args.fullbenchmark:
@@ -197,13 +197,13 @@ if __name__ == "__main__":
 
     print("XGBoost Summary:")
     xgb_reg, train_summary = train_xgb(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded, 
-              estimators=500, lr=0.1, rs=42, transform=False, device='cpu', max_depth=10)
+              estimators=500, lr=0.1, rs=42, transform=True, device='cpu', max_depth=10)
     summary_dict = update_scores(summary_dict,train_summary,'XGBoost')
 
     print("CatBoost Summary:")
     cat_reg, summary_train = train_catboost(X_train, y_train, X_test, y_test, estimators=800, lr=1 / 10, max_depth=10,
                    l2=2, eval_metric="R2", one_hot_max_size=1000, od_type= None, od_wait= None,
-                   transform=False, verbose=False, data_in_leaf=1,cat_features = cat_features)
+                   transform=True, verbose=False, data_in_leaf=1,cat_features = cat_features)
     summary_dict = update_scores(summary_dict,train_summary,'CatBoost')
 
     summary_df = pd.DataFrame(summary_dict) #convert dict to DataFrame
