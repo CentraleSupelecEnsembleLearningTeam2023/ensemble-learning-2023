@@ -57,13 +57,16 @@ def update_scores(summary_dict, train_summary,model_name = ''):
   updated_dict - an updated summary_dict with the new metrics and model name
   '''
   updated_dict = summary_dict.copy()
+  if train_summary == None:
+    return updated_dict
+  
   updated_dict['model'].append(model_name) #append name of model trained
   for i, key in enumerate(list(updated_dict.keys())[1:]): #append summary statistics from reg_metrics
     updated_dict[key].append(round(train_summary[i],3))
   
   return updated_dict
 
-def train_linear_reg(X_train, X_test, y_train, y_test,cross_val = False, transform = False):
+def train_linear_reg(X_train, y_train,X_test y_test,cross_val = False, transform = False):
   from sklearn.model_selection import cross_val_score, KFold
   from sklearn.linear_model import LinearRegression
 
@@ -77,9 +80,9 @@ def train_linear_reg(X_train, X_test, y_train, y_test,cross_val = False, transfo
 
   else:
     lr.fit(X_train,y_train) #fit Linear Regression model
-    train_summary = reg_metrics(y_train,lr.predict(X_train),y_test,lr.predict(X_test),transform = transform) #obtain summary statistics
+    summary_train = reg_metrics(y_train,lr.predict(X_train),y_test,lr.predict(X_test),transform = transform) #obtain summary statistics
 
-  return lr, train_summary
+  return lr, summary_train
 
 def train_decision_tree(X_train,y_train,X_test,y_test,max_depth= None,min_samples_split = 2,cross_val = False,grid_search = False,transform = False):
   '''
