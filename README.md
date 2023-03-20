@@ -32,7 +32,7 @@ is to predict the target variable: price of the listing.
 - Preprocessing - A comprehensive list of functions that will be used for preprocessing
 - Modeling - A comprehensive list of functions used for modeling training and evaluation
 - Training - Conducted with main.py using aforementioned steps and using log(price) as the target variable. When vectorize_text was True, training was done on GPU. It is not recommened to run full benchmark argument when this parameter is True in preprocess_data.
-- Evaluation - Metrics are exported to to a csv file and achieving an R^2 on the test set of 65.6% using log(price) as the evaluation target. Using price the evaluation target, the best R^2 on test set is 215 and best R^2 is 20.3% on test set.
+- Evaluation - Metrics are exported to to a csv file and achieving an R^2 on the test set of 65.6% using log(price) as the evaluation target. Using price the evaluation target, the best RMSE on test set is 215 and best R^2 is 20.3% on test set.
 - Re-evaluation (no outliers) - A branch no_outliers was created to re-evaluate the performance without price outliers. Using price as the evaluation target, the best R^2 on test set was 61.5% and best RMSE of  42.2.
 
 ## Recommendations for use of file - Important
