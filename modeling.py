@@ -66,7 +66,7 @@ def update_scores(summary_dict, train_summary,model_name = ''):
   
   return updated_dict
 
-def train_linear_reg(X_train, y_train,X_test y_test,cross_val = False, transform = False):
+def train_linear_reg(X_train, y_train,X_test, y_test,cross_val = False, transform = False):
   from sklearn.model_selection import cross_val_score, KFold
   from sklearn.linear_model import LinearRegression
 
