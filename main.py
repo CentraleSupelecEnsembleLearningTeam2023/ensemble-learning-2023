@@ -201,7 +201,7 @@ if __name__ == "__main__":
     summary_dict = update_scores(summary_dict,train_summary,'XGBoost')
 
     print("CatBoost Summary:")
-    cat_reg, summary_train = train_catboost(X_train, y_train, X_test, y_test, estimators=800, lr=1 / 10, max_depth=10,
+    cat_reg, train_summary = train_catboost(X_train, y_train, X_test, y_test, estimators=800, lr=1 / 10, max_depth=10,
                    l2=2, eval_metric="R2", one_hot_max_size=1000, od_type= None, od_wait= None,
                    transform=True, verbose=False, data_in_leaf=1,cat_features = cat_features)
     summary_dict = update_scores(summary_dict,train_summary,'CatBoost')
