@@ -62,7 +62,10 @@ def update_scores(summary_dict, train_summary,model_name = ''):
   
   updated_dict['model'].append(model_name) #append name of model trained
   for i, key in enumerate(list(updated_dict.keys())[1:]): #append summary statistics from reg_metrics
-    updated_dict[key].append(round(train_summary[i],3))
+    if train_summary[i] != None:
+      updated_dict[key].append(round(train_summary[i],3))
+    else:
+      updated_dict[key].append(train_summary[i])
   
   return updated_dict
 
