@@ -169,10 +169,10 @@ if __name__ == "__main__":
     summary_dict = {"model": [],"price_rmse_train": [],"price_r2_train":[],"price_rmse_test": [], "price_r2_test": []
          ,"log_price_r2_train": [], "log_price_r2_test": []} #dictionry to store metrics
 
-    print("Linear Regression Summary:")
-    lr, train_summary = train_linear_reg(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded, cross_val = False,
-                    transform = True)
-    summary_dict = update_scores(summary_dict,train_summary,'Linear Regression')
+#     print("Linear Regression Summary:") - Do not use with vectorize_text
+#     lr, train_summary = train_linear_reg(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded, cross_val = False,
+#                     transform = True)
+#     summary_dict = update_scores(summary_dict,train_summary,'Linear Regression')
       
     print("Decision Tree Summary:")
     clf, train_summary = train_decision_tree(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,max_depth= 10,
@@ -192,7 +192,7 @@ if __name__ == "__main__":
     print("LGBM Summary:")
     lgbm_reg, train_summary = train_lgbm(X_train_encoded, y_train_encoded, X_test_encoded, y_test_encoded,
                estimators = 200, lr = 0.07, n_jobs = -1, rs = 42,
-               transform = False)
+               transform = True)
     summary_dict = update_scores(summary_dict,train_summary,'LGBM')
 
     print("XGBoost Summary:")
