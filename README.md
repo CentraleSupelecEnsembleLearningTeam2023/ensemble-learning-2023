@@ -1,12 +1,19 @@
 # New York City Airbnb Price Prediction
 
+## Authors
+The project is done by [Karim El Hage](https://github.com/karimelhage), [Ali Najem](https://github.com/najemali), [Annabelle Luo](https://github.com/annabelleluo), [Xiaoyan Hong](https://github.com/EmmaHongW), [Antoine Cloute](https://github.com/AntAI-Git)
+
+<a href="https://github.com/annabelleluo/ensemble-learning-2023/graphs/contributors"> 
+  <img src="https://contrib.rocks/image?repo=annabelleluo/ensemble-learning-2023" />
+</a>
+
 ## Introduction 
 This is the course project for Ensemble Learning at CentraleSupélec, 2023. Airbnb has become a popular alternative to traditional hotels and has disrupted the hospitality industry. Through Airbnb, individuals can list their own properties as rental places. In New York City
 alone, there are around 40,000 listings. While traditional hotels have teams that carefully measure
 demand and supply to adjust pricing, as a host, it can be challenging to determine the optimal price
 for a listing. The variation in types of listings can also make it difficult for renters to get an accurate
 sense of fair pricing. In this project, we will use ensemble learning methods to predict the price of
-Airbnb listings in New York City.
+Airbnb listings in New York City. 
 
 ## Data 
 The data set for this project is obtained from Kaggle and contains the listings in New York City in
