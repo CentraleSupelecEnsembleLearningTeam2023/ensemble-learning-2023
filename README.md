@@ -25,3 +25,23 @@ The data set contains around 47,000 listings. You can find it [here](https://www
 Random forests, Boosting, Gradient Boosted Trees, AdaBoost, etc.) on this data set. The goal
 is to predict the target variable: price of the listing.
 - Compare performances of models using various metrics learned in class.
+
+## Contents
+- EDA - Exploratory Data Analysis notebook containing data distirbutions, correlation expploration, heatmaps and other key visualizations
+- Feature Engineering - Features engineered for use in modeling (not all made it to the final processing)
+- Preprocessing - A comprehensive list of functions that will be used for preprocessing
+- Modeling - A comprehensive list of functions used for modeling training and evaluation
+- Training - Conducted with main.py using aforementioned steps and using log(price) as the target variable. When vectorize_text was True, training was done on GPU. It is not recommened to run full benchmark argument when this parameter is True in preprocess_data.
+- Evaluation - Metrics are exported to to a csv file and achieving an R^2 on the test set of 65.6% using log(price) as the evaluation target. Using price the evaluation target, the best R^2 on test set is 215 and best R^2 is 20.3% on test set.
+- Re-evaluation (no outliers) - A branch no_outliers was created to re-evaluate the performance without price outliers. Using price as the evaluation target, the best R^2 on test set was 61.5% and best RMSE of  42.2.
+
+## Recommendations for use of file - Important
+- All parameters should only be modefied under if __name__ == "__main__": in main.py
+- If the vectorize_text functionality is kept true in main.py during the definition of the features and targets using preprocess_data, expect long run time. train_random_forest expected to delay runtime. It is recommended to run xgboost on 'cuda' for this functionality. It is not recommended to run train_ensemble_models with this functionality due to runtime. It is recomended for train_ensemble models to have vectorize_text False in preprocess_data.
+- Grid search for XGBoost and CatBoost not added to modeling.py due to heavy runtime. User should implement gridsearch for these seperately.
+- The hyperparameters displayed for all training models in main.py were found on gridsearch based on the  of preprocessing shown. If parameters in preprocess_data function are altered hyperparameters may not perform optimally.
+- A secondary branch "without-outlier" can be run to simulate the performance of the model without price outliers.
+
+
+
+
